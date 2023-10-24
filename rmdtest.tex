@@ -1,0 +1,323 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+  ignorenonframetext,
+]{beamer}
+\usepackage{pgfpages}
+\setbeamertemplate{caption}[numbered]
+\setbeamertemplate{caption label separator}{: }
+\setbeamercolor{caption name}{fg=normal text.fg}
+\beamertemplatenavigationsymbolsempty
+% Prevent slide breaks in the middle of a paragraph
+\widowpenalties 1 10000
+\raggedbottom
+\setbeamertemplate{part page}{
+  \centering
+  \begin{beamercolorbox}[sep=16pt,center]{part title}
+    \usebeamerfont{part title}\insertpart\par
+  \end{beamercolorbox}
+}
+\setbeamertemplate{section page}{
+  \centering
+  \begin{beamercolorbox}[sep=12pt,center]{part title}
+    \usebeamerfont{section title}\insertsection\par
+  \end{beamercolorbox}
+}
+\setbeamertemplate{subsection page}{
+  \centering
+  \begin{beamercolorbox}[sep=8pt,center]{part title}
+    \usebeamerfont{subsection title}\insertsubsection\par
+  \end{beamercolorbox}
+}
+\AtBeginPart{
+  \frame{\partpage}
+}
+\AtBeginSection{
+  \ifbibliography
+  \else
+    \frame{\sectionpage}
+  \fi
+}
+\AtBeginSubsection{
+  \frame{\subsectionpage}
+}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\newif\ifbibliography
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={soc\_stat\_demo},
+  pdfauthor={Eli Lin},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{soc\_stat\_demo}
+\author{Eli Lin}
+\date{2023-10-24}
+
+\begin{document}
+\frame{\titlepage}
+
+\begin{frame}{learning resources and mindset}
+\protect\hypertarget{learning-resources-and-mindset}{}
+\begin{itemize}
+\tightlist
+\item
+  \href{https://stackoverflow.com/}{Stackoverflow}
+\item
+  \href{https://www.edx.org/learn/r-programming/harvard-university-data-science-r-basics?index=product\&queryID=e2a15d51e39a3dd02da1dc5ea276aaef\&position=1\&results_level=first-level-results\&term=r+basic\&objectID=course-91f52ef3-fa3f-4934-9d19-8d5a32635cd4\&campaign=Data+Science\%3A+R+Basics\&source=edX\&product_category=course\&placement_url=https\%3A\%2F\%2Fwww.edx.org\%2Fsearchhttps://}{Edx}
+\item
+  \href{https://github.com/ujjwalkarn/DataScienceR}{github上的學習資源整理}
+\item
+  \href{https://biocorecrg.github.io/CRG_RIntroduction/}{隨便找的筆記}
+\item
+  \href{https://bookdown.org/b08302310/R_learning_notes/}{隨便找的筆記2}
+\item
+  \href{https://app.datacamp.com/learn/courses/free-introduction-to-r}{互動式練習}
+\item
+  \href{https://app.datacamp.com/learn/courses/introduction-to-the-tidyverse}{tidyverse}
+\item
+  \href{https://strengejacke.github.io/sjPlot/}{sjplot}
+\item
+  \href{https://bookdown.org/tonykuoyj/eloquentr/}{台大郭耀仁教授}
+  \#注意多層函數寫法不同
+\item
+  \href{https://statsandr.com/blog/descriptive-statistics-in-r/}{Descriptive
+  statistics in R}
+\item
+  \href{https://support.posit.co/hc/en-us/articles/201057987-Quick-list-of-useful-R-packages}{Quick
+  list of useful R packages}
+\item
+  \href{https://support.rstudio.com/hc/en-us/articles/200711853-Keyboard-Shortcuts}{Rstudio
+  hot keys}
+\item
+  \textbf{不要去什麼hahow之類的給人當韭菜割}
+\item
+  學習程式語言的心態
+\end{itemize}
+\end{frame}
+
+\begin{frame}{installation, enviroment, and setting}
+\protect\hypertarget{installation-enviroment-and-setting}{}
+\begin{itemize}
+\tightlist
+\item
+  R是程式語言, Rstudio是IDE
+\item
+  \href{https://cran.csie.ntu.edu.tw/}{CRAN NTU mirror}
+\item
+  \href{https://posit.co/downloads/}{Rstudio}
+\item
+  environment: grid
+\item
+  不建議保留.Rdata
+\item
+  new project and setting directory
+\end{itemize}
+\end{frame}
+
+\begin{frame}{hot keys}
+\protect\hypertarget{hot-keys}{}
+\begin{itemize}
+\tightlist
+\item
+  ctrl + L clear console
+\item
+  ctrl + alt + R / crtl + shift + enter
+\item
+  tab 操作snippets
+\item
+  ctrl + tab
+\item
+  alt + - 輸入賦值符號''\textless-''
+\item
+  ctrl + shift + F11 重啟R, detach套件, 並清除環境
+\end{itemize}
+\end{frame}
+
+\begin{frame}{style, code etiquette}
+\protect\hypertarget{style-code-etiquette}{}
+\begin{itemize}
+\tightlist
+\item
+  請讓人好讀
+\item
+  \href{https://bookdown.org/tonykuoyj/eloquentr/styleguide.html}{style}
+\item
+  \href{https://style.tidyverse.org/syntax.html}{style, code etiquette}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{packages}
+\protect\hypertarget{packages}{}
+\begin{itemize}
+\tightlist
+\item
+  tidyverse 整合套件，可以用這個去查教學
+
+  \begin{itemize}
+  \tightlist
+  \item
+    ggplot2 作圖
+  \item
+    dplyr 資料整理
+  \item
+    tidyr 表格轉換
+  \item
+    readr 資料載入
+  \item
+    tibble 另一種資料格式
+  \end{itemize}
+\item
+  sjplot
+
+  \begin{itemize}
+  \tightlist
+  \item
+    sjlabelled：讀取處理有標籤格式資料檔與變數
+  \item
+    sjPlot：快速製表與製圖
+  \item
+    sjmisc：效率高的變數描述與編碼
+  \item
+    Sjstats：快速提供模型統計量的計算
+  \end{itemize}
+\item
+  haven 讀取spss, stat檔案
+\item
+  readrxl 讀取excle檔案
+\end{itemize}
+\end{frame}
+
+\begin{frame}{zz}
+\protect\hypertarget{zz}{}
+\begin{itemize}
+\tightlist
+\item
+  Bullet 1
+\item
+  Bullet 2
+\item
+  Bullet 3
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Slide with R Output}
+\protect\hypertarget{slide-with-r-output}{}
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(cars)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      speed           dist       
+##  Min.   : 4.0   Min.   :  2.00  
+##  1st Qu.:12.0   1st Qu.: 26.00  
+##  Median :15.0   Median : 36.00  
+##  Mean   :15.4   Mean   : 42.98  
+##  3rd Qu.:19.0   3rd Qu.: 56.00  
+##  Max.   :25.0   Max.   :120.00
+\end{verbatim}
+\end{frame}
+
+\begin{frame}{Slide with Plot}
+\protect\hypertarget{slide-with-plot}{}
+\includegraphics{rmdtest_files/figure-beamer/pressure-1.pdf}
+\end{frame}
+
+\end{document}

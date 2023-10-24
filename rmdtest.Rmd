@@ -1,0 +1,168 @@
+---
+title: "soc_stat_demo"
+author: "Eli Lin"
+date: "2023-10-24"
+output:
+  ioslides_presentation: default
+  slidy_presentation: default
+  beamer_presentation: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+# R Basic 筆記
+
+> 2023秋季社會統計，筆記共筆
+> [name=Eli Lin]
+
+## why R
+
+用途廣泛、開源社群的力量、學習資源豐富
+
+## learning resources and mindset
+
+- 學習程式語言的心態
+- 請練習
+- [Stackoverflow](https://stackoverflow.com/)
+- [Edx](https://www.edx.org/learn/r-programming/harvard-university-data-science-r-basics?index=product&queryID=e2a15d51e39a3dd02da1dc5ea276aaef&position=1&results_level=first-level-results&term=r+basic&objectID=course-91f52ef3-fa3f-4934-9d19-8d5a32635cd4&campaign=Data+Science%3A+R+Basics&source=edX&product_category=course&placement_url=https%3A%2F%2Fwww.edx.org%2Fsearchhttps://)
+- [github上的學習資源整理](https://github.com/ujjwalkarn/DataScienceR)
+- [隨便找的筆記](https://biocorecrg.github.io/CRG_RIntroduction/)
+- [隨便找的筆記2](https://bookdown.org/b08302310/R_learning_notes/) 
+- [互動式練習](https://app.datacamp.com/learn/courses/free-introduction-to-r)
+- [tidyverse](https://app.datacamp.com/learn/courses/introduction-to-the-tidyverse)
+- [sjplot](https://strengejacke.github.io/sjPlot/)
+- [台大郭耀仁教授](https://bookdown.org/tonykuoyj/eloquentr/) #注意多層函數寫法不同
+- [Descriptive statistics in R](https://statsandr.com/blog/descriptive-statistics-in-r/)
+- [Quick list of useful R packages](https://support.posit.co/hc/en-us/articles/201057987-Quick-list-of-useful-R-packages)
+- [Rstudio hot keys](https://support.rstudio.com/hc/en-us/articles/200711853-Keyboard-Shortcuts)
+- **不要去什麼hahow之類的給人當韭菜割**
+
+
+## installation, enviroment, and setting
+- R是程式語言, Rstudio是IDE
+- [CRAN NTU mirror](https://cran.csie.ntu.edu.tw/)
+- [Rstudio](https://posit.co/downloads/)
+- environment: grid/ list
+- 不建議保留.Rdata
+- new project and setting directory
+
+```
+getwd()
+setwd(dir = "")
+```
+
+##panels
+
+- console
+- environment
+- editor/ viewer
+- packages/ help/ file viewer
+
+## hot keys 
+- ctrl + L clear console
+- ctrl + alt + R / crtl + shift + enter
+- tab 操作snippets
+- ctrl + tab 
+- alt + - 輸入賦值符號"<-"
+- ctrl + shift + F11 重啟R, detach套件, 並清除環境
+
+## style, code etiquette
+- 請讓人好讀
+- [style](https://bookdown.org/tonykuoyj/eloquentr/styleguide.html)
+- [style, code etiquette](https://style.tidyverse.org/syntax.html)
+
+## there are many ways to do things.
+
+```
+foreign::read.spss()
+v.s
+haven::read_sav() #轉換成tibble的df格式
+v.s
+sjlabelled::read_spss()
+```
+
+```
+utils::View()
+v.s
+tibble::View()
+```
+
+## packages
+
+```
+安裝套件
+install.packages("tidyverse")
+```
+
+```
+載入套件
+library(tidyverse)
+```
+
+- tidyverse 現在廣泛使用的套件
+    - ggplot2 作圖
+    - dplyr 資料整理
+    - tidyr 表格轉換
+    - readr 資料載入
+    - tibble 另一種資料格式
+- sjplot
+    - sjlabelled：讀取處理有標籤格式資料檔與變數
+    - sjPlot：快速製表與製圖
+    - sjmisc：效率高的變數描述與編碼
+    - Sjstats：快速提供模型統計量的計算
+- haven 讀取spss, stat檔案 (tibble格式)
+- readrxl 讀取excle檔案
+- foreign 讀取spss, stat檔案 (data.frame格式)
+- [Quick list of useful R packages](https://support.posit.co/hc/en-us/articles/201057987-Quick-list-of-useful-R-packages)
+
+## R reads your codes line by line (sort of)
+```{r}
+A <- 1
+B <- 2
+print(A)
+A <- 87
+print(A)
+```
+
+```{r}
+power_status <- FALSE
+
+if (power_status == TRUE) {
+  print("清華大學")
+} else {
+  print("清寒大學")
+}
+
+```
+
+##function
+```
+mean(1:10, na.rm = TRUE)
+```
+
+
+```
+
+
+```
+
+
+## zz
+
+- Bullet 1
+- Bullet 2
+- Bullet 3
+
+## Slide with R Output
+
+```{r cars, echo = TRUE}
+summary(cars)
+```
+
+## Slide with Plot
+
+```{r pressure}
+plot(pressure)
+```
+111
