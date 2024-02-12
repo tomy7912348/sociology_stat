@@ -1,0 +1,589 @@
+---
+title: "r_test.Rmd"
+author: "Eli Lin"
+date: "2023-12-21"
+output:
+  html_document: default
+  word_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = TRUE,
+	message = TRUE,
+	warning = TRUE
+)
+```
+
+# R 統計檢定
+
+
+```{r include=FALSE}
+# 載入套件
+library(sjlabelled)
+library(sjPlot)
+library(sjmisc)
+library(gmodels)
+library(dplyr)
+library(sjstats)
+```
+
+```{r include=FALSE}
+tscs2020q1 <- read_spss("tscs2020q1.sav", verbose = TRUE, encoding = "big-5")
+```
+```{r eval=FALSE, include=FALSE}
+view_df(tscs2020q1)
+```
+
+## 單樣本t檢定（One-Sample T-test）
+
+- 單樣本t檢定（One-Sample T-test）是用來檢定一個樣本的平均數是否與某個特定的數值有顯著差異。
+  - Independent observations.
+  - Continuous variable.
+  - The population from which the data is sampled is normally distributed.
+- 為什麼用不到z檢定？
+  - 母體標準差未知
+  - 如果樣本數小於30
+  - https://imgur.com/xKiGquq
+
+我們先用一個模擬的樣本來測試單樣本t檢定
+```{r}
+random_ndist <- rnorm(1000, mean = 100, sd = 15) #產生1000個常態分配的隨機數值作為母體
+sample_size_150 <- sample(random_ndist, 150) #隨機抽取150個數值作為樣本
+```
+
+```{r}
+t.test(sample_size_150, mu=110, alternative = "greater") #單樣本t檢定，對立假設為母體平均數大於110
+```
+```{r}
+t.test(sample_size_150, mu=110, alternative = "less") #單樣本t檢定，對立假設為母體平均數小於110
+```
+```{r}
+t.test(sample_size_150, mu=110, alternative = "two.sided") #單樣本t檢定，對立假設為母體平均數不等於110
+```
+- 如何判讀
+  - p-value越大，代表樣本與虛無假設越一致。
+  - 而95%顯著水準，代表如p-value小於0.05，樣本與虛無假設不一致，拒絕虛無假設，接受對立假設
+  - 如p-value大於0.05，代表樣本與假設一致，接受虛無假設，拒絕對立假設
+
+- 實際應用
+  - 已知全清大同學的英文成績平均數為65分。而從人社院同學抽取100名同學的英文成績為樣本，請問人社院同學的英文成績平均與清大同學平均差異是否顯著？
+  - 我們已知全台灣人的某屬性平均數為多少，而我們想要知道某個族群的該屬性平均數是否與全台灣人的平均數有顯著差異。
+  - 根據不動產實價登錄資料，我們知道高雄市的房價平均為多少，而我們想要知道高雄市的某個行政區的房價平均是否與高雄市的房價平均有顯著差異。
+
+
+#### tscs樣本的投票率
+
+- v84 今年1月的總統選舉，請問您有沒有去投票?投給誰?
+- 中選會選後公布的投票率為74.9%
+  
+```{r}
+vote_binary_v84 <- rec(tscs2020q1$v84, rec="1,2,3,4,5=1 [有投票];
+                                           6=0 [沒有投票];
+                                           7,8,97,98,99=NA") #沒有總統投票權的也設為NA
+mean(vote_binary_v84, na.rm = TRUE) #tscs全部樣本的投票率為0.8471051
+```
+
+  
+```{r}
+tscs2020q1_taiwanese <- filter(tscs2020q1, v85==1) #只保留v85回答為台灣人的樣本
+vote_binary_v84_taiwanese <- rec(tscs2020q1_taiwanese$v84, rec="1,2,3,4,5=1 [有投票];
+                                                                6=0 [沒有投票];
+                                                                7,8,97,98,99=NA") #沒有總統投票權的也設為NA
+mean(vote_binary_v84_taiwanese, na.rm = TRUE) #tscs認同為台灣人樣本的投票率為0.8460961
+```
+
+```{r}
+tscs2020q1_chinese <- filter(tscs2020q1, v85==2) #只保留v85回答為中國人的樣本
+vote_binary_v84_chinese <- rec(tscs2020q1_chinese$v84, rec="1,2,3,4,5=1 [有投票];
+                                                                6=0 [沒有投票];
+                                                                7,8,97,98,99=NA") #沒有總統投票權的也設為NA
+mean(vote_binary_v84_chinese, na.rm = TRUE) #tscs認同為中國人樣本的投票率為0.8709677
+```
+
+- 認同為台灣人的樣本的投票率，是否中選會選後公布的投票率有顯著差異？
+```{r}
+t.test(vote_binary_v84_taiwanese, 
+       mu=0.749, #中選會公布的投票率
+       alternative = "greater", #對立假設為母體平均數大於0.749
+       conf.level = 0.99) 
+
+```
+
+- 認同為中國人的樣本的投票率，是否與tscs全樣本的投票率有顯著差異？
+```{r}
+t.test(vote_binary_v84_chinese, 
+       mu=0.8471051, #「母體」的投票率
+       alternative = "two.sided", #對立假設為母體平均數大於0.8471051
+       conf.level = 0.99)
+```
+
+- tscs樣本與普查所得的真實投票率有差異，這在大型的社會調查中很常見，所以運用tscs這類資料庫時，有時還需要考量你的需求進行加權，以符合真實的情況。
+
+#### 高雄買賣實價登錄
+
+[高雄市112年不動產買賣實價登錄資料下載](https://data.gov.tw/dataset/163707)
+
+```{r}
+X112q2 <- read.csv("112q2.csv") #讀取資料, csv檔案代表comma-separated values，是常見的資料集格式
+```
+
+```{r}
+total_price <- as.numeric(gsub(",","",X112q2$房地總價)) #將房地總價的資料型態轉為數值型態，並將千分位符號去除
+```
+
+```{r}
+鼓山_price <- as.numeric(gsub(",","",filter(X112q2, 行政區=="鼓山區")$房地總價)) #將鼓山區的房地總價的資料型態轉為數值型態，並將千分位符號去除
+```
+
+```{r}
+mean(total_price, na.rm = TRUE) #全高雄市不動產買賣平均價格為10965638
+```
+
+```{r}
+t.test(鼓山_price, 
+       mu=10965638, #母體的平均價格
+       alternative = "greater", #對立假設為平均數小於10965638
+       conf.level = 0.99)
+```
+
+## 兩樣本t檢定（Two-Sample t-test）
+
+- 比較兩個獨立樣本的平均值，以確定它們是否顯著不同
+  - Data values must be independent. Measurements for one observation do not affect measurements for any other observation.
+  - Data in each group must be obtained via a random sample from the population.
+  - Data in each group are normally distributed.
+  - Data values are continuous.
+
+- 進行兩樣本t檢定你需要考慮的事情
+  - 成對還是不成對
+    - 成對：同一個人在不同時間點的數據；比較同一樣本中2016年總統大選跟2020年總統大選的投票率，這兩個變數就是成對的
+    - 不成對：不同人的數據；在TEDS中，我比較民進黨支持者跟國民黨支持者的投票率，這兩個變數就是不成對的
+  - 兩樣本變異數是否相等
+    - 透過Levene's test來檢定變異數是否相等
+    - 如果變異數不相等，則使用Welch's t-test
+    - 但方便同學理解，以下我們先不考慮變異數的問題，等等再來討論Levene's test
+
+#### Levene's test
+
+```{r}
+teds2020 <- haven::read_dta("TEDS2020_Q.dta") #讀取資料
+```
+
+```{r include=FALSE}
+view_df(teds2020) #檢視資料
+```
+
+- J1 在這一次(1月11日)舉行的總統大選中，您有沒有去投票?
+```{r}
+teds_vote_2020_j1 <- rec(teds2020$J1, rec="1=1 [有投票];
+                                        2=0 [沒有投票];
+                                        91,95=NA") #沒有總統投票權的也設為NA
+mean(teds_vote_2020_j1, na.rm = TRUE) #樣本2020的投票率為0.8839286
+```
+
+- J2	請問上一次(2016年1月)的總統選舉，您投給哪一組候選人?
+```{r}
+teds_vote_2016_j2 <- rec(teds2020$J2, rec="1,2,3,94=1 [有投票]; 
+                                      93,96=0 [沒投票];
+                                      91,92,95=NA")
+mean(teds_vote_2016_j2, na.rm = TRUE) #樣本2016年的投票率為0.8507042
+```
+
+```{r}
+var.test(teds_vote_2020_j1, teds_vote_2016_j2) # 檢驗兩樣本變異數是否相等
+```
+- p-value很小，所以拒絕兩樣本變異數相等的虛無假設，判斷兩樣本變異數不相等
+
+
+#### 成對樣本t檢定（Paired samples t-test）
+
+```{r}
+t.test(teds_vote_2020_j1, teds_vote_2016_j2, var.equal = FALSE, paired = TRUE)
+```
+- p-value < 0.05，所以我們可以拒絕虛無假設，認為2020年的投票率與2016年的投票率有顯著差異。
+
+#### 非成對樣本t檢定 teds2020 cynicism
+
+- 犬儒/憤世嫉俗（cynicism）是政治社會學中的一個概念，指的是對政治的憤世嫉俗、不信任、懷疑、懷疑論的態度。犬儒主義者認為，政治家是自私的，只為了自己的利益而行動，而不是為了公眾利益。
+- TEDS調查中提供了一些題項來測量民眾對政治的憤世嫉俗的態度，我們可以用這些題項來建立一個簡單的犬儒態度（cynicism）量表。
+
+```{r include=FALSE}
+# 用六項問題的分數來建立一個簡單的犬儒態度（cynicism）量表
+
+# D1	有人說: 「我們一般民眾對政府的作為，沒有任何影響力。」
+item1_D1 <- rec(teds2020$D1, rec="1=2 [非常同意];
+                                  2=1 [同意];
+                                  3=-1 [不同意];
+                                  4=-2 [非常不同意];
+                                  96=0 [看情形];
+                                  97=0 [無意見];
+                                  98=0 [不知道];
+                                  95=NA")
+
+# D2	有人說: 「政府官員不會在乎我們一般民眾的想法」
+item2_D2 <- rec(teds2020$D2, rec="1=2 [非常同意];
+                                  2=1 [同意];
+                                  3=-1 [不同意];
+                                  4=-2 [非常不同意];
+                                  96=0 [看情形];
+                                  97=0 [無意見];
+                                  98=0 [不知道];
+                                  95=NA")
+
+# D5 有人說: 「政府官員時常浪費一般民眾所繳納的稅金。」
+item3_D5 <- rec(teds2020$D5, rec="1=2 [非常同意];
+                                  2=1 [同意];
+                                  3=-1 [不同意];
+                                  4=-2 [非常不同意];
+                                  96=0 [看情形];
+                                  97=0 [無意見];
+                                  98=0 [不知道];
+                                  95=NA")
+
+# E2 有人說: 「大多數的政治人物並不關心一般民眾。」
+item4_E2 <- rec(teds2020$E2, rec="1=2 [非常同意];
+                                  2=1 [同意];
+                                  3=0 [既不同意也不反對];
+                                  4=-1 [不同意];
+                                  5=-2 [非常不同意]; 
+                                  96=0 [看情形];
+                                  97=0 [無意見];
+                                  98=0 [不知道];
+                                  95=NA")
+
+# E4 有人說: 「政治人物是我們國家最主要的問題所在。」
+item5_E4 <- rec(teds2020$E4, rec="1=2 [非常同意];
+                                  2=1 [同意];
+                                  3=0 [既不同意也不反對];
+                                  4=-1 [不同意];
+                                  5=-2 [非常不同意]; 
+                                  96=0 [看情形];
+                                  97=0 [無意見];
+                                  98=0 [不知道];
+                                  95=NA")
+
+# E7 有人說: 「大多數的政治人物只重視有錢有勢者的利益。」
+item6_E7 <- rec(teds2020$E7, rec="1=2 [非常同意];
+                                  2=1 [同意];
+                                  3=0 [既不同意也不反對];
+                                  4=-1 [不同意];
+                                  5=-2 [非常不同意]; 
+                                  96=0 [看情形];
+                                  97=0 [無意見];
+                                  98=0 [不知道];
+                                  95=NA")
+
+```
+
+```{r}
+# 將六項問題的分數加總，並建立一個新的變數，名為cynicism
+teds2020_with_cynicism <- mutate(teds2020, cynicism = item1_D1 + item2_D2 + item3_D5 + item4_E2 + item5_E4 + item6_E7)
+```
+
+
+再以政黨認同來分組，看看不同政黨的支持者，對政府的犬儒態度有何差異。
+
+```{r}
+cynicism_dpp <- filter(teds2020_with_cynicism, PartyID == 2)$cynicism
+cynicism_kmt <- filter(teds2020_with_cynicism, PartyID == 1)$cynicism
+cynicism_tmd <- filter(teds2020_with_cynicism, PartyID == 7)$cynicism
+cynicism_npp <- filter(teds2020_with_cynicism, PartyID == 6)$cynicism
+```
+
+
+```{r}
+summary(teds2020_with_cynicism$cynicism)
+```
+```{r}
+summary(cynicism_dpp)
+```
+```{r}
+summary(cynicism_kmt)
+```
+```{r}
+summary(cynicism_tmd)
+```
+```{r}
+summary(cynicism_npp)
+```
+
+- DPP vs KMT 支持者的犬儒態度分數有無顯著差異？
+```{r}
+var.test(cynicism_dpp, cynicism_kmt) # 先檢定兩樣本變異數是否相等
+```
+  - p值大於0.05，接受兩樣本變異數相等的虛無假設
+
+```{r}
+t.test(cynicism_dpp, cynicism_kmt, var.equal = TRUE, paired = FALSE)
+```
+  - p值小於0.05，因此我們可以說，DPP vs KMT 支持者的犬儒態度分數有顯著差異。
+
+- NPP vs TMD 支持者的犬儒態度分數有無顯著差異？
+
+```{r}
+var.test(cynicism_npp, cynicism_tmd) # 先檢定兩樣本變異數是否相等
+```
+  - p值大於0.05，接受兩樣本變異數相等的虛無假設 
+
+```{r}
+t.test(cynicism_npp, cynicism_tmd, var.equal = TRUE, paired = FALSE)
+```
+  - p值大於0.05，因此我們可以說，NPP vs TMD 支持者的犬儒態度分數沒有顯著差異。
+
+#### 兩樣本比例檢定（Two-sample proportion test）
+
+- 檢定兩樣本比例是否相等
+- 應用
+  - 抽取兩份病患樣本，我們想知道兩份樣本中吸煙者的比例是否相等
+  - 我想比較TEDS跟TSCS兩份調查中，支持台灣獨立的比例是否相等
+
+
+```{r include=FALSE}
+# v86 就台灣和中國大陸(兩岸)關係上，您覺得台灣未來獨立，和中國大陸統一，還是維持現狀比較好?
+
+cross_strait_tscs <- rec(tscs2020q1$v86, rec="1=-1 [統一];
+                                           2=1 [獨立];
+                                           3,4,93,97=0 [其他];
+                                           98=NA [拒答];
+                                           99=NA")
+```
+```{r}
+frq(cross_strait_tscs)
+```
+
+
+```{r include=FALSE}
+# P4 關於臺灣和大陸的關係，請問您比較偏向哪一種?
+
+cross_strait_teds <- rec(teds2020$P4, rec="1,3=-1 [統一];
+                                           2,4=1 [獨立];
+                                           5,6,96,97,98=0 [其他]; 
+                                           95=NA [拒答]") 
+```
+
+```{r}
+frq(cross_strait_teds)
+```
+
+
+```{r}
+# 計算兩份調查中，支持台灣獨立的人數
+# sum函數一般是用來計算向量中的數值總和，但是在R中，TRUE代表1，FALSE代表0，因此我們可以利用sum函數來計算向量中value == 1的數量，也就是支持台灣獨立的人數
+n_of_TI <- c(sum(cross_strait_tscs == 1, na.rm = TRUE), sum(cross_strait_teds == 1, na.rm = TRUE))
+
+# 計算兩份調查中總共的樣本數
+n_of_total <- c(length(cross_strait_tscs), length(cross_strait_teds))
+```
+
+```{r}
+prop.test(n_of_TI, n_of_total)
+```
+- p值小於0.05，因此我們可以說，TEDS跟TSCS兩份調查中，支持台灣獨立的比例不相等。
+
+### 獨立性卡方檢定（Chi-square test of independence）
+
+- 一般卡方檢定又稱皮爾森卡方檢定（Pearson's chi-squared test）
+- 類別變項 vs 類別變項
+- 樣本為獨立樣本
+- 資料要是頻率、次數，不能是比例
+- 結果只告訴你有沒有相關，相關是否顯著，但不會告訴你相關的方向與程度（正相關或負相關）
+- 如果有一個類別的頻率小於5，則需要合併類別，或是使用精確檢定（Fisher's exact test）
+
+
+#### teds2020 民主鞏固
+- 政治社會學中，對於民主鞏固的標準之一，是民主政治是否成為普遍同意的規則（only game in town）；而我們可以用teds的問題來看看政黨立場的人對於民主政治的看法是否有顯著差異。
+
+```{r include=FALSE}
+# H1 接下來，請教您一些對於臺灣民主政治的看法，對於卡片上這三種說法，請問您比較同意哪個說法？
+
+democracy_tscs <- rec(teds2020$H1, rec="1=1 [不管什麼情況，民主政治都是最好的體制];
+                                        2=2 [在有些情況下，獨裁的政治體制比民主政治好];
+                                        3=3 [對我而言，任何一種政治體制都是一樣];
+                                        96,97,98=NA;
+                                        95=NA")
+
+PartyID_rec <- rec(teds2020$PartyID, rec="1=1 [國民黨]; 
+                                          2=2 [民進黨];
+                                          6=6 [時代力量]];
+                                          7=7 [台灣民眾黨];
+                                          3,4,5,9=NA")
+```
+
+```{r}
+tab_xtab(democracy_tscs, PartyID_rec, encoding = "UTF-8", statistic = "auto",show.cell.prc = TRUE, show.row.prc = TRUE, show.col.prc = TRUE)
+# 這個函式不會順便幫你跑卡方檢定，要自己另外跑
+# cell.prc: 顯示每個格子的百分比 紅色
+# row.prc: 顯示每個列的百分比 藍色
+# col.prc: 顯示每個行的百分比 綠色
+```
+
+
+```{r}
+chisq.test(democracy_tscs, PartyID_rec)
+```
+- 虛無假設：兩變數之間沒有關係
+- 對立假設：兩變數之間有關係
+- p值小於0.05，因此我們可以說，政黨立場跟民主政治的看法並獨立
+
+
+```{r}
+CrossTable(democracy_tscs, teds2020$Tondu3, chisq = TRUE, format = "SPSS")
+```
+
+### 類別變項相關性檢定
+
+- 透過卡方檢定，我們可以知道兩個類別變項之間是否有相關性，但是卡方檢定並不會告訴我們相關的方向與程度
+- 而檢定顯示兩變項顯著相關時，就可以再透過各種相關係數來得知相關的方向與程度
+- 類別變項相關係數的解釋原則
+
+#### Phi coefficient
+
+- 用於2個二元類別變項之間的相關性
+- phi相關係數的範圍是-1到1，0表示沒有相關性，1表示完全正相關，-1表示完全負相關。
+  - |0~0.3|：低度相關
+  - |0.3~0.5|：中度相關
+  - |0.5以上|：高度相關
+  
+```{r include=FALSE}
+# K10 去年夏天開始的香港反送中示威抗議活動，有人認為這是香港民眾爭取民主自由，也有人認為這是破壞社會秩序，請問您認為這是哪一種情況？
+HK_K10 <- rec(teds2020$K10, rec="1=1 [是香港民眾爭取民主自由];
+                                  2=2 [是破壞社會秩序];
+                                  95,96,97,98=NA")
+
+```
+
+
+```{r}
+tab_xtab(HK_K10, teds2020$sex, encoding = "UTF-8", statistic = "phi",show.cell.prc = TRUE, show.row.prc = TRUE, show.col.prc = TRUE)
+```
+- 虛無假設：兩變數之間沒有關係
+- 對立假設：兩變數之間有關係
+- 計算結果相關係數為0.022，表示兩個變項之間的相關性很低。
+- 而p值也大於0.05，因此我們無法拒絕虛無假設，亦即性別跟對於香港反送中的看法沒有顯著相關。
+
+#### Cramer's V
+
+- 數值介於0到1之間，0表示沒有相關性，1表示完全相關。
+- 用於超過2個類別變項之間的相關性
+- 類別變項相關係數的解釋原則
+  - 0~0.1: little if any association
+  - 0.1~0.3: weak association
+  - 0.3~0.5: moderate association
+  - 0.5~1: strong association
+  
+```{r}
+tab_xtab(democracy_tscs, PartyID_rec, encoding = "UTF-8", statistic = "cramer",show.cell.prc = TRUE, show.row.prc = TRUE, show.col.prc = TRUE)
+# cell.prc: 顯示每個格子的百分比 紅色
+# row.prc: 顯示每個列的百分比 藍色
+# col.prc: 顯示每個行的百分比 綠色
+```
+
+### 順序變項相關性檢定
+
+```{r include=FALSE}
+# v36 關於社會現象的敘述，請問您贊不贊成：有人說台灣社會愈來愈亂，大家都不守法，也不守規矩。
+
+perceived_anomie <- rec(tscs2020q1$v36, rec="1=1 [非常贊成];
+                                  2=2 [贊成];
+                                  3=3 [不贊成];
+                                  4=4 [非常不贊成];
+                                  94,95,97,98,99=NA")
+
+# v79c 請問您贊不贊成?對付殘暴的犯人，應馬上處罰，不必等待緩慢的法院審判
+
+judical_attitude <- rec(tscs2020q1$v79c, rec="1=1 [非常贊成];
+                                  2=2 [贊成];
+                                  3=3 [不贊成];
+                                  4=4 [非常不贊成];
+                                  93,95,97,98,99=NA")
+```
+
+
+
+
+#### Goodman-Kruskal’s gamma
+
+- 兩個順序尺度變項之間的相關性
+- 相關係數介於-1到1之間，0表示沒有相關性，1表示完全正相關，-1表示完全負相關。
+
+```{r eval=FALSE, include=FALSE}
+install.packages("oii")
+```
+
+```{r include=FALSE}
+library(oii)
+```
+```{r}
+association.measures(perceived_anomie, judical_attitude)
+```
+
+
+#### Kendall's tau coefficient
+
+- 兩個順序尺度變項之間的相關性
+- 相關係數介於-1到1之間，0表示沒有相關性，1表示完全正相關，-1表示完全負相關。
+
+```{r}
+tab_xtab(perceived_anomie, judical_attitude, encoding = "UTF-8", statistic = "kendall",show.cell.prc = TRUE, show.row.prc = TRUE, show.col.prc = TRUE)
+
+```
+
+```{r eval=FALSE, include=FALSE}
+install.packages("effectsize")
+```
+
+```{r include=FALSE}
+library(effectsize)
+```
+
+```{r}
+interpret_kendalls_w(0.263)
+```
+
+
+#### Spearman’s rho
+
+- 兩個順序尺度變項之間的相關性
+- 相關係數介於-1到1之間，0表示沒有相關性，1表示完全正相關，-1表示完全負相關
+
+```{r}
+tab_xtab(perceived_anomie, judical_attitude, encoding = "UTF-8", statistic = "spearman",show.cell.prc = TRUE, show.row.prc = TRUE, show.col.prc = TRUE)
+
+```
+
+
+#### ANOVA
+
+
+
+### temp
+
+```{r}
+tscs_partyID <- rec(tscs2020q1$v89, rec="1=1 [國民黨];
+                                  2=2 [民進黨];
+                                  6=6 [時代力量];
+                                  7=7 [台灣民眾黨];
+                                  9=9 [台灣基進];
+                                  3,4,5,8,10,11,97,98,99=NA")
+```
+
+```{r}
+perceived_anomie_binary <- rec(tscs2020q1$v36, rec="1,2=1 [贊成];
+                                  3,4=2 [不贊成];
+                                  94,95,97,98,99=NA")
+```
+
+```{r}
+```
+
+
+```{r}
+tab_xtab(perceived_anomie_binary, tscs_partyID, encoding = "UTF-8", statistic = "cramer",show.cell.prc = TRUE, show.row.prc = TRUE, show.col.prc = TRUE)
+```
+
+
+
+
+

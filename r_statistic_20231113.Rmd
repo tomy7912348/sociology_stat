@@ -1,0 +1,729 @@
+---
+title: "soc_stat_demo"
+author: "Eli Lin"
+date: "2023-11-14"
+output:
+  beamer_presentation: default
+  ioslides_presentation:
+    fig_width: 30
+    fig_height: 30
+    fig_caption: yes
+  slidy_presentation: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/37i9dQZF1DX5trt9i14X7j?utm_source=generator&amp;theme=0" width="100%" height="352" frameBorder="0" allowfullscreen allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy">
+
+</iframe>
+
+# R Basic
+
+> 2023秋季社會統計，筆記共筆 [name=Eli Lin]
+
+## Why R
+
+-   用途廣泛，可用於社會統計、資料科學、機器學習、自然語言處理......
+-   開源社群的力量、學習、求助資源豐富
+-   簡單、好懂
+
+## Mindset
+
+-   這是人寫出來給人用的，你一定能搞懂（大概啦）
+-   code海無涯，唯Google是岸，還能找copilot幫開船
+-   寫自己的筆記
+-   請練習
+
+## Learning Resources
+
+-   **不要去什麼hahow之類的給人當韭菜割**
+-   [Stackoverflow](https://stackoverflow.com/)
+-   [Edx](https://www.edx.org/learn/r-programming/harvard-university-data-science-r-basics?index=product&queryID=e2a15d51e39a3dd02da1dc5ea276aaef&position=1&results_level=first-level-results&term=r+basic&objectID=course-91f52ef3-fa3f-4934-9d19-8d5a32635cd4&campaign=Data+Science%3A+R+Basics&source=edX&product_category=course&placement_url=https%3A%2F%2Fwww.edx.org%2Fsearchhttps://)
+-   [github上的學習資源整理](https://github.com/ujjwalkarn/DataScienceR)
+-   [隨便找的筆記](https://biocorecrg.github.io/CRG_RIntroduction/)
+-   [隨便找的筆記2](https://bookdown.org/b08302310/R_learning_notes/)
+-   [datacamp互動式練習](https://app.datacamp.com/learn/courses/free-introduction-to-r)
+-   [tidyverse](https://app.datacamp.com/learn/courses/introduction-to-the-tidyverse)
+-   [sjplot](https://strengejacke.github.io/sjPlot/)
+-   [台大郭耀仁教授](https://bookdown.org/tonykuoyj/eloquentr/) \# 注意nesting函式寫法不同
+-   [Descriptive statistics in R](https://statsandr.com/blog/descriptive-statistics-in-r/)
+-   [Quick list of useful R packages](https://support.posit.co/hc/en-us/articles/201057987-Quick-list-of-useful-R-packages)
+-   [Rstudio hot keys](https://support.rstudio.com/hc/en-us/articles/200711853-Keyboard-Shortcuts)
+
+## Installation, Environment, and Settings
+
+-   R是程式語言, Rstudio是IDE
+-   把CRAN mirror改成NTU
+-   [CRAN NTU mirror](https://cran.csie.ntu.edu.tw/)
+-   [Rstudio](https://posit.co/downloads/)
+-   environment: grid/ list
+-   不建議保留.Rdata (global options \> general \> workspace \> uncheck "restore .Rdata..." and chose never save .Rdata)
+-   new project and setting directory
+
+```{r eval=FALSE, include=FALSE}
+getwd()
+# setwd(dir = "")  要用"/"，不要用"\"
+
+```
+
+## Panels
+
+-   console
+-   environment
+-   editor/ viewer
+-   packages/ help/ file viewer
+
+## Hot Keys
+
+-   不同版本或是安裝不同套件可能會改變快捷鍵的設定
+-   tools \> modify keyboard shortcuts
+-   ctrl + S save file
+-   ctrl + L clear console
+-   crtl + shift + enter run all
+-   tab 操作snippets
+-   ctrl + tab 切換分頁
+-   ctrl + w 關閉分頁
+-   alt + - 輸入賦值符號"\<-"
+-   ctrl + shift + F10 重啟R, detach套件, 並清除環境
+
+## Style, Code Etiquette and Good Habit
+
+-   易讀，減少錯誤
+-   [style](https://bookdown.org/tonykuoyj/eloquentr/styleguide.html)
+-   [style, code etiquette](https://style.tidyverse.org/syntax.html)
+-   寫code好習慣，要保留的東西就要寫在script或是markdown裡面，不要留在console
+
+## There are many ways to do things.
+
+同樣是讀取spss檔案，有很多種方式可以做到，差別在於不同套件提供的功能跟方法可能不一樣
+
+```{r eval=FALSE, include=FALSE}
+foreign::read.spss() # 從foreign套件呼叫read.spss()函式
+# v.s
+haven::read_sav() #轉換成tibble的df格式
+# v.s
+sjlabelled::read_spss() 
+```
+
+```{r eval=FALSE, include=FALSE}
+utils::View()
+# v.s
+tibble::View()
+```
+
+## Packages
+
+```{r eval=FALSE, include=FALSE}
+# 安裝套件
+install.packages("tidyverse") #記得引號
+```
+
+```{r eval=FALSE, include=FALSE}
+# 載入套件
+library(tidyverse)
+```
+
+-   tidyverse 廣泛被使用的整合套件
+    -   ggplot2 作圖
+    -   dplyr 資料整理
+    -   tidyr 表格轉換
+    -   readr 資料載入
+    -   tibble 另一種資料格式
+-   sjplot
+    -   sjlabelled：讀取處理有標籤格式資料檔與變數
+    -   sjPlot：製圖
+    -   sjmisc：變數描述與編碼
+    -   Sjstats：模型統計量的計算
+-   haven 讀取spss, stat檔案 (tibble格式)
+-   readrxl 讀取excle檔案
+-   foreign 讀取spss, stat檔案 (data.frame格式)
+-   [Quick list of useful R packages](https://support.posit.co/hc/en-us/articles/201057987-Quick-list-of-useful-R-packages)
+
+## Basic Syntax
+
+賦值 with "\<-"
+
+"=" 也可以用來賦值，但是不建議使用，因為會跟函式的參數混淆
+
+```{r eval=FALSE, include=FALSE}
+
+# 這是註解，不會被執行
+
+number_of_students <- 30 #將數值30，賦值給物件number_of_students
+name <- "陳明祺" #將字串"陳明祺"，賦值給物件name
+
+# ==================================================
+
+library(foreign) #載入foreign套件
+w5_taiwan <- read.spss("W5_Taiwan_coreQrelease_20190805.sav", to.data.frame = TRUE)
+#將W5_Taiwan_coreQrelease_20190805.sav檔案，賦值給物件w5_taiwan
+```
+
+連接行 "+"
+
+```{r}
+A <- 1 + 2 + 3 +
+  4 + 5 
+
+A
+
+# 雖然結果正確，但這樣的寫法降低了易讀性
+```
+
+```{r}
+B <- 1 + 2 + 3 #R以為計算結束了，所以不會一併執行下一行
+  + 4 + 5
+
+B
+```
+
+引號代表字串
+
+```{r}
+
+A <- 87
+B <- "87"
+
+```
+
+```{r}
+class(A)
+```
+
+```{r}
+class(B)
+```
+
+## 存取符號(Accessors)
+
+```{r}
+data("airquality") #從內建資料集中載入airquality資料集
+View(airquality) #查看airquality資料集
+```
+
+```{r}
+temperature <- airquality$Temp #將airquality資料集中的Temp變數，賦值給物件temperature
+```
+
+```{r}
+sequence <- c(0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144) 
+#將數值向量c(0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144)，賦值給物件sequence
+sequence[1] #存取sequence物件中的第一個元素
+sequence[2:4] #存取sequence物件中的第二到四個元素
+
+# 注意：與其他程式語言不同，R的索引值是從1開始，而不是0
+```
+
+## R reads your codes by "sentence"
+
+R的console「大致上」會一行一行的執行你的程式碼，但更準確來說，R是「一句一句」的執行你的程式碼，而在R語言中，大多數的情況是以換行作為「句號」。
+
+```{r}
+A <- 1 
+B <- 2
+print(A)
+A <- 87
+print(A)
+```
+
+```{r}
+power_status <- FALSE
+
+if (power_status == TRUE) {
+  print("清華大學")
+} else {
+  print("清寒大學")
+}
+
+```
+
+## Function
+
+請養成閱讀說明文件的好習慣
+
+```{r}
+data("airquality") # 從內建資料集中載入airquality資料集
+mean(airquality$Ozone, na.rm = TRUE) # 計算airquality資料集中的Ozone變數的平均值
+```
+
+```{r}
+help("mean") #尋找mean函式的說明文件
+```
+
+```{r}
+??mean
+```
+
+舉例mean()這個函式的使用方法
+
+```{r}
+example("mean")
+```
+
+```{r}
+mean(airquality$Ozone, na.rm = TRUE) #計算airquality資料集中的Ozone變數的平均值，並忽略遺漏值
+```
+
+```{r}
+mean(airquality$Ozone, trim = 0.1, na.rm = TRUE) 
+# 計算airquality資料集中的Ozone變數的平均值，並忽略遺漏值，且忽略最大與最小的10%數值(排除極端值)
+```
+
+## Data Types
+
+| 資料類型 | 資料類型在R的英文 | 舉例       |
+|----------|-------------------|------------|
+| 字串     | character         | "陳明祺"   |
+| 數值     | numeric           | 2          |
+| 整數     | integer           | 2L         |
+| 邏輯值   | logical           | TRUE       |
+| 日期     | Date              | Sys.Date() |
+| 時間     | POSIXct POSIXt    | Sys.time() |
+
+-   整數
+
+```{r}
+integer <- 87L
+class(integer)
+```
+
+-   coercion
+
+```{r}
+integer + 2L
+x <- integer + 3
+class(x)
+```
+
+-   logical
+
+```{r}
+is.numeric("89") #判斷integer物件是否為數值 
+```
+
+```{r}
+date <- Sys.Date()
+class(date)
+```
+
+```{r}
+
+class(airquality) 
+typeof(airquality) 
+```
+
+[mode跟class的差別](https://rpubs.com/kalipradeep/mode_vs_class) [mode, class and typeof](https://stackoverflow.com/questions/35445112/what-is-the-difference-between-mode-and-class-in-r)
+
+## Data Structure
+
+### 向量 vector
+
+-   一個向量內必須是同一種資料類型
+
+```{r}
+height <- c(180, 170, 160)
+print(height)
+```
+
+-   向量可以以索引值存取
+
+```{r}
+height[1]
+```
+
+-   向量可以有名字
+
+```{r}
+names(height) <- c("Armin", "Eren", "Mikasa")
+```
+
+-   向量可以用名字來當索引值
+
+```{r}
+height["Armin"]
+```
+
+### 矩陣 matrix
+
+matrix是有維度的vector，也就是說，一個矩陣可以有多個row跟column，而且每個row跟column的資料類型必須相同（可以有例外，但會讓資料很難處裡）。
+
+-   以matrix函式來建立矩陣，matrix函式的參數有以下幾個：
+
+```{r}
+num_matrix <- matrix(1:88, 
+                     nrow = 8, 
+                     byrow = TRUE, 
+                     dimnames = list(c("A","B","C","D","E","F","G","H"), 
+                                     c("a","b","c","d","e","f","g","h","i","j","k")))
+print(num_matrix)
+```
+
+-   從vector轉換成matrix
+
+```{r}
+survey_corps <- c("Eren", "Mikasa", "Armin","Levi", "Erwin", "Hange", "Jean", "Connie", "Sasha", "Historia")
+dim(survey_corps) <- c(2, 5)
+print(survey_corps)
+```
+
+-   從matrix轉換成vector
+
+```{r}
+as.vector(survey_corps) # by column
+```
+
+```{r}
+as.vector(t(survey_corps)) # by row, t()是轉置矩陣的函式
+```
+
+### 陣列 array
+
+array是有多個維度的matrix，統計中不好用也很少用，知道就好。
+
+-   用array函式建立陣列，array函式的參數有以下幾個：
+
+```{r}
+num_array <- array(1:24, 
+                   dim = c(2, 5, 2),
+                   dimnames = list(c("A","B"), 
+                                   c("a","b","c","d","e"), 
+                                   c("first","second")))
+list(num_array)
+```
+
+-   修改matrix的dimension屬性，從matrix轉換成array
+
+```{r}
+dim(survey_corps) <- c(1, 5, 2)
+list(survey_corps)
+```
+
+```{r}
+class(survey_corps)
+```
+
+### 清單 list
+
+list是一個可以儲存不同資料類型的向量，也就是說，list可以儲存向量、矩陣、陣列、資料框、函式等等。
+
+```{r}
+
+paradise_island <- list(names = survey_corps, height = height, matrix = num_matrix, array = num_array)
+paradise_island[[1]]
+paradise_island[[2]]
+paradise_island
+```
+
+### 資料框 data.frame
+
+-   從matrix轉換成data.frame
+
+```{r}
+survey_corps_df <- as.data.frame(survey_corps)
+View(survey_corps_df)
+```
+
+```{r}
+library(sjlabelled)
+w5 <- read_spss("W5_Taiwan_coreQrelease_20190805.sav")
+```
+
+### 因子 factor
+
+用於儲存類別（categorical）變項，可以設定level來表示順序（ordinal）別的變數
+
+```{r}
+likert_scale <- factor(c("Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"), 
+                       ordered = TRUE, # 有順序
+                       levels = c("Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree")) # level的順序
+```
+
+```{r}
+likert_scale 
+```
+
+## Data Processing
+
+在社會科學統計裡面，我們經常需要進行標籤（labeled）資料的處理。因為一個變項的屬性通常相當複雜，例如婚姻狀況可能包含未婚、已婚、離婚、喪偶、分居、拒答、漏答等等不同的屬性；此時在資料處理上將不同的屬性（回答）編號，再透過標籤描述屬性會是最常見的做法。而R基本套件跟sjplot系列套件都可以處理標籤資料，我們接下來用台灣社會變遷調查2020q1的資料集來進行範例。
+
+### 載入資料集
+
+讀取.sav
+
+```{r}
+library(sjlabelled) #載入sjlabelled套件
+tscs2020q1_sj <- read_spss("tscs2020q1.sav", en = "big-5") #載入tscs2020Q1.sav檔案，存入物件tscs2020q1
+```
+
+讀取.xls或是.xlsx
+
+```{r}
+library(readxl) #載入readxl套件 
+tscs2020q1_excel <- read_excel("test_excel.xlsx") #載入tscs2020Q1.xlsx檔案，存入物件tscs2020q1
+```
+
+讀取.dta
+
+```{r}
+library(sjlabelled) #載入sjlabelled套件
+tscs2020q1_dta <- read_stata("tscs2020q1.dta") #載入tscs2020Q1.dta檔案，存入物件tscs2020q1
+```
+
+把資料集存成檔案
+
+```{r}
+library(sjlabelled)
+write_spss(tscs2020q1_dta, "tscs2020q1_new.sav") #存成.sav檔案
+
+```
+
+```{r}
+save(tscs2020q1_sj, file = "tscs2020q1.rda") #存成R語言原生資料格式.rda檔案
+
+```
+
+### 怎麼弄清楚資料的標籤跟對應屬性？
+
+-   查資料集的codebook
+    -   但可能沒有，或是資料集本身編碼不一致
+    -   此時就不建議對整個資料集做編碼/標籤的處理 (例如不同變項的遺漏值可能設定不同)
+    -   要單獨查特定變項中的標籤與對應的值
+-   用attributes函式檢查物件的屬性
+
+```{r}
+x <- attributes(tscs2020q1_sj$v17) #檢查tscs2020q1是否有標籤
+x # 輸出list
+```
+
+```{r}
+View(x$labels)
+```
+
+-   用sjlabelled套件的方法
+
+```{r}
+lables_of_v7a <- get_labels(tscs2020q1_sj$v7a, values = "p") #注意是get_labels函式，不是get_label，後者只會給你變數的標籤
+# 取得v7a變數值的標籤，然後存到物件lables_of_v7a
+# value = "p or "n"，來設定輸出的格式，p是標籤，n是數值
+lables_of_v7a
+```
+
+```{r}
+lables_of_v8 <- get_labels(tscs2020q1_sj$v8, values = "n")
+# 取得v8變數值的標籤，然後存到物件lables_of_v8
+View(lables_of_v8)
+```
+
+```{r}
+lables_of_v17 <- get_labels(tscs2020q1_sj$v17, values = "n")
+# 取得v17變數值的標籤，然後存到物件lables_of_v17
+View(lables_of_v17)
+```
+
+-   用foreign套件的方法（直接把值轉換成標籤）
+
+```{r}
+tscs2020q1_foreign <- foreign::read.spss("tscs2020q1.sav", to.data.frame = TRUE, use.value.labels = TRUE) 
+# 載入tscs2020q1.sav檔案，存入物件tscs2020q1_foreign
+```
+
+-   用sjPlot::view_df()函式看全部變項
+
+```{r}
+library(sjPlot)
+view_df(tscs2020q1_sj, max.len = 50, verbose = TRUE) # 如果每行沒有對齊，請修改瀏覽器字體，要找半形數字跟全形中文高度一樣的字體
+```
+
+### 遺漏值的處理
+
+我們甚少直接透過原始的資料集進行統計的計算，通常會擷取需要使用的變項到獨立的物件中，而我們可以在擷取的過程中，同時進行遺漏值或其他資料處理。
+
+-   婚姻狀態變項為例
+
+```{r}
+list(tscs2020q1_sj$v8) # 檢視tscs2020q1_sj資料集中的v8變數
+```
+
+```{r}
+library(sjmisc)
+marital_status <- set_na(tscs2020q1_sj$v8, na = c(9,98,99)) #擷取tscs2020q1_sj資料集中的v8變數，存入marital_status物件，並將98與99的值轉換成遺漏值
+```
+
+```{r}
+attributes(marital_status) # 檢視marital_status物件
+
+```
+
+```{r}
+marital_status
+```
+
+-   新聞偏好變項為例
+
+```{r}
+list(tscs2020q1_sj$v17) # 檢視tscs2020q1_sj資料集中的v17變數
+```
+
+```{r}
+news_preference <- set_na(tscs2020q1_sj$v17, na = c(95:99)) #擷取tscs2020q1_sj資料集中的v17變數，存入news_preference物件，並將94到99的值轉換成遺漏值
+```
+
+```{r}
+list(news_preference) # 檢視news_preference物件
+```
+
+### 把值轉換成標籤
+
+```{r}
+marital_status_label <- as_label(marital_status) # 將marital_status物件的值轉換成標籤，存入marital_status_label物件
+```
+
+```{r}
+list(marital_status_label) # 檢視marital_status_label物件
+```
+
+### 重新編碼
+
+-   用sjlabelled::replace_labels修改標籤
+
+```{r}
+marital_status_label_fixed <- replace_labels(marital_status,
+                                             labels = c("單身且沒結過婚" = 1, 
+                                                        "離婚" = 6)) # 將marital_status物件中的1與6的標籤修改
+attributes(marital_status_label_fixed)
+```
+
+-   用sjmisc::rec重新編碼,編標籤
+
+```{r}
+marital_status_rec <- rec(marital_status, 
+                          rec = "2,3,4,5,7=1 [已婚];1,6,8=0 [未婚];9=NA;98=NA;99=NA") 
+# 將marital_status物件中的2,3,4,5,7的值轉換成1，1,6,8的值轉換成0，9,98,99的值轉換成遺漏值
+```
+
+```{r}
+attributes(marital_status_rec) # 檢視marital_status_rec物件的屬性
+list(marital_status_rec)
+```
+
+## 基礎圖、表格繪製
+
+```{r}
+library(sjPlot) # 載入sjPlot套件
+library(sjmisc) # 載入sjmisc套件
+library(sjlabelled) #載入sjlabelled套件
+library(ggplot2) # 請注意函式衝突的警告訊息
+```
+
+```{r}
+tscs2020q1_sj <- read_spss("tscs2020q1.sav", en = "big-5", verbose = TRUE) #載入tscs2020Q1.sav檔案，存入物件tscs2020q1
+```
+
+```{r}
+marital_status <- set_na(tscs2020q1_sj$v8, na = c(9,98,99)) #擷取tscs2020q1_sj資料集中的v8變數，存入marital_status物件，並將98與99的值轉換成遺漏值
+news_preference <- set_na(tscs2020q1_sj$v17, na = c(94:99)) #擷取tscs2020q1_sj資料集中的v17變數，存入news_preference物件，並將94到99的值轉換成遺漏值
+```
+
+### 次數分配表
+
+-   用table函式
+
+```{r}
+table(marital_status, useNA = "always") # 計算marital_status物件的次數分配表，並顯示遺漏值
+```
+
+```{r}
+table(sjlabelled::as_label(marital_status), useNA = "always")
+# 太多層的nesting函式也會降低易讀性，可以透過建立物件來避免(但犧牲效率)
+```
+
+-   gmodels套件的CrossTable函式
+
+```{r}
+library(gmodels)
+CrossTable(sjlabelled::as_label(marital_status), useNA = "always") # 計算marital_status物件的次數分配表，並顯示遺漏值
+```
+
+-   sjmisc套件的frq函式
+
+```{r}
+frq_marital_status <- as.data.frame(frq(marital_status)) # 計算marital_status物件的次數分配表，並存入frq_marital_status物件
+```
+
+輸出html排版，可以直接複製到word
+
+```{r}
+frq(marital_status, show.na = TRUE, out = "viewer") # 計算marital_status物件的次數分配表，並顯示遺漏值
+```
+
+-   Hmisc::describe函式
+
+```{r}
+library(Hmisc)
+birth_year <- tscs2020q1_sj$v2y # 擷取tscs2020q1_sj資料集中的v2y變數，存入birth_year物件
+describe(birth_year) # 計算birth_year物件的次數分配表
+```
+
+-   sjmisc::descr()函式
+
+```{r eval=FALSE, include=FALSE}
+descr(birth_year, out = "viewer") # 計算marital_status物件的次數分配表
+```
+
+-   sjPlot::view_df()函式
+
+```{r}
+view_df(tscs2020q1_sj, 
+        show.na = TRUE,
+        show.frq = TRUE,
+        show.prc = TRUE,
+        show.labels = TRUE) # 顯示frq_marital_status物件
+```
+
+### 次數分配長條圖
+
+```{r}
+set_theme(base = theme_blank(), # base argument 用來設定從ggplot2套件中設定好的既有主題
+          plot.backcol = "grey", 
+          geom.label.color = "black", 
+          geom.outline.color = "white",
+          theme.font = "jf-openhuninn-2.0") # 設定主題的背景顏色、標籤顏色、外框顏色
+
+plot_frq(marital_status, # 繪製marital_status物件的長條圖
+         type = "bar", # 設定繪製長條圖
+         coord.flip = TRUE, # 設定xy軸翻轉
+         sort.frq = "asc", # or "desc"代表降冪排序
+         geom.colors = "pink") # 設定長條圖顏色
+```
+
+R studio的圖表瀏覽器會根據大小自動重新render圖片
+
+-   分組長條圖
+
+```{r}
+gender <- tscs2020q1_sj$v1 # 擷取tscs2020q1_sj資料集中的v1變數，存入gender物件
+plot_grpfrq(marital_status_label_fixed, gender, type = "bar") # 繪製marital_status_label_fixed與gender物件的分組長條圖
+```
+
+```{r}
+plot_grpfrq(marital_status_label_fixed, gender, 
+            type = "bar", 
+            bar.pos = "stack", # 設定長條圖堆疊
+            show.n = TRUE, # 顯示次數
+            show.prc = FALSE,
+            title = "請問您目前的婚姻狀況是？")
+```
+
+### 我想要酷酷的字型怎麼辦
+
+額外的字型需要透過extrafont套件來讀取
+
+```{r}
+install.packages("extrafont") # 安裝extrafont套件
+library(extrafont) # 載入extrafont套件
+font_import() # 讀取電腦中的字型，要花一段時間
+loadfonts(device = "win") # 讀取字型
+fonts() # 顯示可用所有字型
+```
